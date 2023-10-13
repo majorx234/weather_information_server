@@ -6,6 +6,8 @@ use axum::{
 };
 use std::net::SocketAddr;
 use std::sync::Arc;
+use std::thread;
+use crossbeam_channel::bounded;
 
 use weather_information::{
     config::Config,
@@ -15,8 +17,10 @@ use weather_information::{
 #[tokio::main]
 async fn main() {
     let config = Config::new();
-    let server_state = Arc::new(ServerElements::new());
 
+    let (image_tx, image_rx) = bounded(3);
+    let server_state = Arc::new(ServerElements::new(image_rx));
+    let scrapper_thread = thread::spawn(move || {});
     let addr = config.get_host_socket_addr();
 
     let routes_all = Router::new()
