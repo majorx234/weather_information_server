@@ -1,17 +1,22 @@
 use axum::{
+    extract::State,
     response::{Html, IntoResponse},
     routing::get,
     Router,
 };
 use std::net::SocketAddr;
+use std::sync::Arc;
 
 use weather_information::{
     config::Config,
+    server_state::{ServerElements, ServerState},
 };
 
 #[tokio::main]
 async fn main() {
     let config = Config::new();
+    let server_state = Arc::new(ServerElements::new());
+
     let addr = config.get_host_socket_addr();
 
     let routes_all = Router::new()
