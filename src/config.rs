@@ -32,4 +32,7 @@ impl Config {
     pub fn get_scrap_frequency(&self) -> Duration {
         self.scrap_freq
     }
+    pub fn get_app_user_agent(&self) -> String {
+        "weather_app".to_string()
+    }
 }
