@@ -1,28 +1,25 @@
-use std::boxed::Box;
-use std::sync::Arc;
+use crossbeam_queue::ArrayQueue;
+use std::sync::{Arc, Mutex};
 
 pub struct ServerElements {
     image_data: u32,
-    rx_image_channel: Option<crossbeam_channel::Receiver<u32>>,
+    arc_aq: Option<Arc<ArrayQueue<u32>>>,
 }
 
 impl ServerElements {
-    pub fn new(rx_image_channel: crossbeam_channel::Receiver<u32>) -> ServerElements {
+    pub fn new(arc_aq: Arc<ArrayQueue<u32>>) -> ServerElements {
         ServerElements {
             image_data: 0,
-            rx_image_channel: Some(rx_image_channel),
+            arc_aq: Some(arc_aq),
         }
     }
     pub fn get_image_data(&mut self) -> u32 {
-        if let Some(rx_image_channel) = &self.rx_image_channel {
-            match rx_image_channel.recv() {
-                Ok(image_data) => {
-                    self.image_data = image_data;
-                }
-                Err(_) => (),
+        if let Some(arc_aq) = &self.arc_aq {
+            if let Some(image_data) = arc_aq.pop() {
+                self.image_data = image_data;
             }
         }
-        return self.image_data;
+        self.image_data
     }
 }
 
@@ -30,9 +27,9 @@ impl Default for ServerElements {
     fn default() -> ServerElements {
         ServerElements {
             image_data: 0,
-            rx_image_channel: None,
+            arc_aq: None,
         }
     }
 }
 
-pub type ServerState = Arc<ServerElements>;
+pub type ServerState = Arc<Mutex<ServerElements>>;
