@@ -1,6 +1,7 @@
-use crate::config::Config;
+use crate::{config::Config, error::Error};
 use reqwest;
 use reqwest::blocking::Client;
+use reqwest::Url;
 
 struct PageScraper {
     client: Client,
@@ -16,5 +17,10 @@ impl PageScraper {
             .build()
             .expect("couldn't create requests client");
         PageScraper { client }
+    }
+
+    pub fn extract_temperature_from(url: &String) -> Result<i32, Error> {
+        let url = Url::parse(url)?;
+        Ok(12)
     }
 }
