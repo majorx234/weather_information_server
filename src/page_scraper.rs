@@ -3,7 +3,7 @@ use reqwest;
 use reqwest::blocking::Client;
 use reqwest::Url;
 
-struct PageScraper {
+pub struct PageScraper {
     client: Client,
 }
 
@@ -19,8 +19,10 @@ impl PageScraper {
         PageScraper { client }
     }
 
-    pub fn extract_temperature_from(url: &String) -> Result<i32, Error> {
+    pub fn extract_temperature_from(&self, url: &String) -> Result<i32, Error> {
         let url = Url::parse(url)?;
+        let res = self.client.get(url).send()?.text()?;
+        println!("{:#?}", res);
         Ok(12)
     }
 }
