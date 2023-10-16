@@ -12,6 +12,7 @@ use tokio;
 use weather_information::{
     config::Config,
     server_state::{ServerElements, ServerState},
+     page_scraper::PageScraper,
 };
 
 #[tokio::main]
@@ -24,11 +25,14 @@ async fn main() {
     let scrapper_thread = thread::spawn(move || {
         let config = Config::new();
         let sec = config.get_scrap_frequency();
-        let mut counter = 0;
+        let url_plain = config.get_weather_url();
         while true {
             std::thread::sleep(sec);
-            counter += 1;
-            let _ = arc_aq.force_push(counter);
+            let weather_page = PageScraper::new();
+            if let Ok(temperatur_data) =
+                weather_page.extract_temperature_from(&url_plain.to_string(), &config.get_selector()) {
+                    let _ = arc_aq.force_push(temperatur_data);
+                }
         }
     });
     let addr = config.get_host_socket_addr();
