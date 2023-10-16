@@ -3,10 +3,11 @@ use std::str::FromStr;
 use std::time::Duration;
 
 pub struct Config {
-    pub host_ip: String,
-    pub port: u32,
-    pub scrap_freq: Duration,
-    pub weather_url: String,
+    host_ip: String,
+    port: u32,
+    scrap_freq: Duration,
+    weather_url: String,
+    selector: String,
 }
 
 impl Config {
@@ -23,11 +24,14 @@ impl Config {
                 .unwrap(),
         );
 
+        let selector = std::env::var("SELECTOR").expect("SELECTOR not set");
+
         Config {
             host_ip,
             port: port.parse::<u32>().unwrap(),
             scrap_freq,
             weather_url: url,
+            selector,
         }
     }
     pub fn get_host_socket_addr(&self) -> SocketAddr {
@@ -41,5 +45,8 @@ impl Config {
     }
     pub fn get_weather_url(&self) -> String {
         self.weather_url.clone()
+    }
+    pub fn get_selector(&self) -> String {
+        self.selector.clone()
     }
 }
