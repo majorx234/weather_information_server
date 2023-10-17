@@ -129,16 +129,18 @@ impl ImageBuffer {
     }
     pub fn update_image(&mut self, new_val: f32) {
         self.count += 1;
+        self.temp = new_val;
         for pixel in self.image.pixels_mut() {
             *pixel = Rgb([255u8, 255u8, 255u8]);
         }
 
         let font_data: &[u8] = include_bytes!("../fonts/Comfortaa-Medium.ttf");
         let font: Font<'static> = Font::try_from_bytes(font_data).expect("failed to open font");
-        let temp_x = 80.0;
+        let temp_x = 390.0;
         let temp_y = 100.0;
         let temp_size = 150.0;
-        let temp_text = format!("No: {} - {}°C", self.count, self.temp);
+        let temp_text = format!("No {}: {}°C", self.count, self.temp);
+        println!("temp_text : {} data: {}", temp_text, self.temp);
         draw_text_centered(
             &mut self.image,
             &temp_text,
