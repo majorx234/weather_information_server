@@ -1,8 +1,11 @@
 use chrono::Duration;
-use image::{Rgb, RgbImage};
+use image::{ImageFormat, Rgb, RgbImage};
 use imageproc::drawing::Canvas;
 use rusttype::{point, Font, PositionedGlyph, Rect, Scale};
-use std::cmp::max;
+use std::{
+    cmp::max,
+    io::{BufWriter, Cursor},
+};
 
 // Code mostly taken wholesale from
 // https://github.com/image-rs/imageproc/blob/master/src/drawing/text.rs
@@ -116,20 +119,24 @@ impl ImageBuffer {
             count: 0,
         }
     }
-    pub fn get_image(&self) -> f32 {
+    pub fn get_image(&self) -> Vec<u8> {
         // TODO: save image as png in memory
-        0.0
+        let mut buffer = BufWriter::new(Cursor::new(Vec::new()));
+        self.image.write_to(&mut buffer, ImageFormat::Png).unwrap();
+
+        let bytes: Vec<u8> = buffer.into_inner().unwrap().into_inner();
+        return bytes;
     }
     pub fn update_image(&mut self, new_val: f32) {
         self.count += 1;
-        let white = image::Rgb([255u8, 255u8, 255u8]);
-        let black = image::Rgb([0u8, 0u8, 0u8]);
-        let red = image::Rgb([255u8, 0u8, 0u8]);
+        for pixel in self.image.pixels_mut() {
+            *pixel = Rgb([255u8, 255u8, 255u8]);
+        }
 
         let font_data: &[u8] = include_bytes!("../fonts/Comfortaa-Medium.ttf");
         let font: Font<'static> = Font::try_from_bytes(font_data).expect("failed to open font");
-        let temp_x = 10.0;
-        let temp_y = 0.0;
+        let temp_x = 80.0;
+        let temp_y = 100.0;
         let temp_size = 150.0;
         let temp_text = format!("No: {} - {}°C", self.count, self.temp);
         draw_text_centered(
@@ -140,5 +147,10 @@ impl ImageBuffer {
             &font,
             temp_size,
         )
+    }
+
+    pub fn save_image(&self) {
+        let counter = self.count;
+        self.image.save(format!("test{}.png", counter)).unwrap();
     }
 }

@@ -1,5 +1,6 @@
 use crate::image_buffer::ImageBuffer;
 use crossbeam_queue::ArrayQueue;
+use image::ImageFormat;
 use std::sync::{Arc, Mutex};
 
 pub struct ServerElements {
@@ -14,7 +15,7 @@ impl ServerElements {
             arc_aq: Some(arc_aq),
         }
     }
-    pub fn get_image_data(&mut self) -> f32 {
+    pub fn get_image_data(&mut self) -> Vec<u8> {
         if let Some(arc_aq) = &self.arc_aq {
             if let Some(image_data) = arc_aq.pop() {
                 self.image_data.update_image(image_data);
