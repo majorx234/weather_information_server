@@ -20,6 +20,7 @@ path = "src/page_scraper_cli/main.rs"
 axum = {version = "0.6.18", features = ["headers", "multipart"]}
 axum-client-ip = { version = "0.4.1" }
 axum-extra = { version = "0.8.0" }
+chrono = { version = "0.4.31" }
 serde = { version = "1.0.167", features = ["derive"] }
 serde_json = { version = "1.0.100" }
 async-trait = { version = "0.1.71"}
@@ -29,3 +30,6 @@ crossbeam-queue = { version = "0.3.8" }
 reqwest = { version = "0.11.22", features = ["blocking", "json"] }
 scraper = { version = "0.17.1"}
 url = { version = "2.4.1" }
+image = { version = "0.24.7" }
+imageproc = { version = "0.23.0"}
+rusttype = { version = "0.9.3" }
