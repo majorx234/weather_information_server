@@ -6,10 +6,12 @@ use scraper::{Html, Selector};
 
 pub struct PageScraper {
     client: Client,
+    url: Url,
+    selector: Selector,
 }
 
 impl PageScraper {
-    pub fn new() -> Self {
+    pub fn new(url: &str, selector_str: &str) -> Self {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.insert("Content-Type", "application/geo+json".parse().unwrap());
         let client = reqwest::blocking::Client::builder()
@@ -17,17 +19,21 @@ impl PageScraper {
             .default_headers(headers)
             .build()
             .expect("couldn't create requests client");
-        PageScraper { client }
+        let url = Url::parse(url).unwrap();
+        let selector = Selector::parse(selector_str).unwrap();
+        PageScraper {
+            client,
+            url,
+            selector,
+        }
     }
 
-    pub fn extract_temperature_from(&self, url: &str, selector: &str) -> Result<f32, Error> {
-        let url = Url::parse(url)?;
-        let res = self.client.get(url).send()?.text()?;
+    pub fn extract_temperature_from(&self) -> Result<f32, Error> {
+        let res = self.client.get(self.url.clone()).send()?.text()?;
         let document = Html::parse_document(res.as_str());
 
-        let measurements_selector = Selector::parse(selector).unwrap();
         let measurements = document
-            .select(&measurements_selector)
+            .select(&self.selector)
             .map(|x| x.inner_html())
             .collect::<Vec<String>>();
         let s_len = measurements[2].len();
