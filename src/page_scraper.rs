@@ -8,10 +8,11 @@ pub struct PageScraper {
     client: Client,
     url: Url,
     selector: Selector,
+    data_index: usize,
 }
 
 impl PageScraper {
-    pub fn new(url: &str, selector_str: &str) -> Self {
+    pub fn new(url: &str, selector_str: &str, data_index: usize) -> Self {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.insert("Content-Type", "application/geo+json".parse().unwrap());
         let client = reqwest::blocking::Client::builder()
@@ -25,6 +26,7 @@ impl PageScraper {
             client,
             url,
             selector,
+            data_index,
         }
     }
 
@@ -36,7 +38,7 @@ impl PageScraper {
             .select(&self.selector)
             .map(|x| x.inner_html())
             .collect::<Vec<String>>();
-        let s_len = measurements[2].len();
+        let s_len = measurements[self.data_index].len();
         let temp_string = measurements[2].replace("°C", "");
         let temperatur = temp_string.parse::<f32>().unwrap();
         Ok(temperatur)

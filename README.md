@@ -16,5 +16,6 @@
   - `SCRAP_FREQ` - time between scraper calls to url
   - `WEATHER_URL` - irl to get data from
   - `SELECTOR` - DOM selector to get datastring from url
+  - `DATA_INDEX` - Index in slector return list
 # Test REST Interface
-- `curl http://127.0.0.1:8080/weather_information`
+- `curl http://127.0.0.1:8080/weather_information.png`

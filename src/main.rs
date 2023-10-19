@@ -29,7 +29,7 @@ async fn main() {
         let url_plain = config.get_weather_url();
         while true {
             std::thread::sleep(sec);
-            let weather_page = PageScraper::new(&url_plain.to_string(), &config.get_selector());
+            let weather_page = PageScraper::new(&url_plain.to_string(), &config.get_selector(), config.get_data_index());
             if let Ok(temperatur_data) =
                 weather_page.extract_temperature_from() {
                     let _ = arc_aq.force_push(temperatur_data);

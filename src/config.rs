@@ -8,6 +8,7 @@ pub struct Config {
     scrap_freq: Duration,
     weather_url: String,
     selector: String,
+    data_index: usize,
 }
 
 impl Config {
@@ -17,6 +18,7 @@ impl Config {
         let port = std::env::var("PORT").expect("PORT not set");
         let weath = std::env::var("HOST_IP").expect("HOST_IP not set");
         let url = std::env::var("WEATHER_URL").expect("WEATHER_URL not set");
+        let data_index = std::env::var("DATA_INDEX").expect("DATA_INDEX not set");
         let scrap_freq = std::time::Duration::from_secs(
             std::env::var("SCRAP_FREQ")
                 .expect("SCRAP_FREQ not set")
@@ -32,6 +34,7 @@ impl Config {
             scrap_freq,
             weather_url: url,
             selector,
+            data_index: data_index.parse::<usize>().unwrap(),
         }
     }
     pub fn get_host_socket_addr(&self) -> SocketAddr {
@@ -48,5 +51,8 @@ impl Config {
     }
     pub fn get_selector(&self) -> String {
         self.selector.clone()
+    }
+    pub fn get_data_index(&self) -> usize {
+        self.data_index
     }
 }
