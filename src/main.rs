@@ -7,13 +7,12 @@ use axum::{
 };
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
-use std::thread;
 use crossbeam_queue::ArrayQueue;
 use tokio;
 use weather_information::{
     config::Config,
+    scrap_manager::start_scraping,
     server_state::{ServerElements, ServerState},
-    page_scraper::PageScraper,
 };
 
 #[tokio::main]
@@ -23,19 +22,8 @@ async fn main() {
     let aq = ArrayQueue::new(2);
     let arc_aq = Arc::new(aq);
     let server_state = Arc::new(Mutex::new(ServerElements::new(arc_aq.clone())));
-    let scrapper_thread = thread::spawn(move || {
-        let config = Config::new();
-        let sec = config.get_scrap_frequency();
-        let url_plain = config.get_weather_url();
-        while true {
-            std::thread::sleep(sec);
-            let weather_page = PageScraper::new(&url_plain.to_string(), &config.get_selector(), config.get_data_index());
-            if let Ok(temperatur_data) =
-                weather_page.extract_temperature_from() {
-                    let _ = arc_aq.force_push(temperatur_data);
-                }
-        }
-    });
+
+    start_scraping(arc_aq);
     let addr = config.get_host_socket_addr();
 
     let routes_all = Router::new()
