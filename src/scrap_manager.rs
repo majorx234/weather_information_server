@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::page_scraper::PageScraper;
 use crossbeam_queue::ArrayQueue;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::thread;
 
 pub fn start_scraping(arc_aq: Arc<ArrayQueue<f32>>) {

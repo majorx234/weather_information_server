@@ -1,6 +1,5 @@
 use crate::image_buffer::ImageBuffer;
 use crossbeam_queue::ArrayQueue;
-use image::ImageFormat;
 use std::sync::{Arc, Mutex};
 
 pub struct ServerElements {

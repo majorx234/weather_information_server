@@ -1,9 +1,5 @@
 use axum::{
-    Error,
-    extract::State,
-    response::{Html, IntoResponse},
-    routing::get,
-    Router, headers::Header, http::HeaderMap,
+    Router,
 };
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
@@ -12,7 +8,8 @@ use tokio;
 use weather_information::{
     config::Config,
     scrap_manager::start_scraping,
-    server_state::{ServerElements, ServerState},
+    server_state::ServerElements,
+    routers::weather_information_image,
 };
 
 #[tokio::main]
@@ -27,7 +24,7 @@ async fn main() {
     let addr = config.get_host_socket_addr();
 
     let routes_all = Router::new()
-        .route("/weather_information.png", get(handler_weather_information))
+        .merge(weather_information_image::get_route())
         .with_state(server_state);
 
     axum::Server::bind(&addr)
@@ -35,13 +32,3 @@ async fn main() {
         .await
         .expect("failed to start server");
 }
-
-async fn handler_weather_information(State(server_state): State<ServerState>) -> impl IntoResponse {
-    let temperature_bytes = server_state.lock().unwrap().get_image_data();
-    let mut headers = HeaderMap::new();
-    headers.insert("Content-Type", "image/png".parse().unwrap());
-
-    (headers, temperature_bytes)
-//    Html(format!("1°C - it's getting hot"))
-}
-
