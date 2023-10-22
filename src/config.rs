@@ -16,7 +16,6 @@ impl Config {
     pub fn new() -> Config {
         let host_ip = std::env::var("HOST_IP").expect("HOST_IP not set");
         let port = std::env::var("PORT").expect("PORT not set");
-        let weath = std::env::var("HOST_IP").expect("HOST_IP not set");
         let url = std::env::var("WEATHER_URL").expect("WEATHER_URL not set");
         let data_index = std::env::var("DATA_INDEX").expect("DATA_INDEX not set");
         let scrap_freq = std::time::Duration::from_secs(
@@ -25,7 +24,6 @@ impl Config {
                 .parse::<u64>()
                 .unwrap(),
         );
-
         let selector = std::env::var("SELECTOR").expect("SELECTOR not set");
 
         Config {

@@ -1,4 +1,3 @@
-use chrono::Duration;
 use image::{ImageFormat, Rgb, RgbImage};
 use imageproc::drawing::Canvas;
 use rusttype::{point, Font, PositionedGlyph, Rect, Scale};
@@ -6,6 +5,20 @@ use std::{
     cmp::max,
     io::{BufWriter, Cursor},
 };
+
+use embedded_graphics::prelude::*;
+use epd_waveshare::buffer_len;
+use epd_waveshare::{
+    color::*,
+    epd7in5b_v2::{HEIGHT as EPD_HEIGHT, WIDTH as EPD_WIDTH},
+    graphics::VarDisplay,
+};
+
+pub type EInkBuffer = Vec<u8>;
+
+const WHITE: Rgb<u8> = image::Rgb([255u8, 255u8, 255u8]);
+const BLACK: Rgb<u8> = image::Rgb([0u8, 0u8, 0u8]);
+const RED: Rgb<u8> = image::Rgb([255u8, 0u8, 0u8]);
 
 // Code mostly taken wholesale from
 // https://github.com/image-rs/imageproc/blob/master/src/drawing/text.rs
@@ -126,6 +139,29 @@ impl ImageBuffer {
 
         let bytes: Vec<u8> = buffer.into_inner().unwrap().into_inner();
         return bytes;
+    }
+    pub fn get_eink_buffer(&self) -> EInkBuffer {
+        let mut buffer = vec![
+            TriColor::White.get_byte_value();
+            buffer_len(EPD_WIDTH as usize, 2 * EPD_HEIGHT as usize)
+        ];
+        let mut display = VarDisplay::<TriColor>::new(EPD_WIDTH, EPD_HEIGHT, &mut buffer, false)
+            .expect("failed to create display");
+        for (x, y, p) in self.image.enumerate_pixels() {
+            let x = x as i32;
+            let y = y as i32;
+            let pt = Point::new(x, y);
+            if *p == WHITE {
+                display.set_pixel(Pixel(pt, TriColor::White));
+            } else if *p == BLACK {
+                display.set_pixel(Pixel(pt, TriColor::Black));
+            } else if *p == RED {
+                display.set_pixel(Pixel(pt, TriColor::Chromatic));
+            } else {
+                display.set_pixel(Pixel(pt, TriColor::White));
+            }
+        }
+        buffer
     }
     pub fn update_image(&mut self, new_val: f32) {
         self.count += 1;

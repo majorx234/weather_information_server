@@ -33,3 +33,5 @@ url = { version = "2.4.1" }
 image = { version = "0.24.7" }
 imageproc = { version = "0.23.0"}
 rusttype = { version = "0.9.3" }
+embedded-graphics = "0.8"
+epd-waveshare = { git = "https://github.com/caemor/epd-waveshare", rev = "cff9130baafca999f9d524a8f0262621c5ae5539" }
