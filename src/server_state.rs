@@ -22,6 +22,14 @@ impl ServerElements {
         }
         self.image_data.get_image()
     }
+    pub fn get_eink_data(&mut self) -> Vec<u8> {
+        if let Some(arc_aq) = &self.arc_aq {
+            if let Some(image_data) = arc_aq.pop() {
+                self.image_data.update_image(image_data);
+            }
+        }
+        self.image_data.get_eink_buffer()
+    }
 }
 
 impl Default for ServerElements {
